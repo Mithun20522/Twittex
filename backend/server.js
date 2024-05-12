@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import connectMongoDB from './db/connectMongo.js'
 import authRouter from './routes/auth.route.js'
+import userRouter from './routes/user.route.js'
 
 dotenv.config()
 
@@ -21,6 +22,7 @@ connectMongoDB(MONGO_URL)
 
 // apis routes
 app.use('/api/auth',authRouter)
+app.use('/api/user',userRouter)
 
 
 app.listen(PORT,() => console.log(`server is running on PORT:${PORT}`))
