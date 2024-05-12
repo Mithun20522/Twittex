@@ -5,6 +5,7 @@ import cors from 'cors'
 import connectMongoDB from './db/connectMongo.js'
 import authRouter from './routes/auth.route.js'
 import userRouter from './routes/user.route.js'
+import notifcationRouter from './routes/notfication.route.js'
 
 dotenv.config()
 
@@ -20,9 +21,9 @@ app.use(cookieParser())
 
 connectMongoDB(MONGO_URL)
 
-// apis routes
+
 app.use('/api/auth',authRouter)
 app.use('/api/user',userRouter)
-
+app.use('/api/notification', notifcationRouter)
 
 app.listen(PORT,() => console.log(`server is running on PORT:${PORT}`))
