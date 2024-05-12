@@ -66,7 +66,12 @@ export const signin = async(req, res) => {
 
 export const signout = async(req, res) => {
     try {
-        
+        const token = req.cookies.jwt
+        if(!token){
+            return res.status(400).json({message:'Please login first'})
+        }
+        res.clearCookie("jwt",token)
+        return res.status(200).json({message:'logout successfull'})
     } catch (error) {
         return res.status(500).json({message:error.message})
     }
