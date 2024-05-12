@@ -39,3 +39,35 @@ export const signup = async(req, res) => {
         return res.status(500).json({message:error.message})
     }
 }
+export const signin = async(req, res) => {
+    try {
+        const {username, password} = req.body
+        if(!username || !password){
+            return res.status(400).json({message:'All fields are mandatory'})
+        }
+        
+        const existingUser = await User.findOne({username})
+        if(!existingUser){
+            return res.status(404).json({message:'No user found'})
+        }
+        const validUser = bcrypt.compareSync(password, existingUser.password)
+
+        if(!validUser){
+            return res.status(400).json({message:'Wrong credentials'})
+        }
+        generateTokenAndSetCookies(existingUser._id, res)
+        const {password:pass,...rest} = existingUser._doc
+        return res.status(201).json({message:'Login successfull', rest})
+        
+    } catch (error) {
+        return res.status(500).json({message:error.message})
+    }
+}
+
+export const signout = async(req, res) => {
+    try {
+        
+    } catch (error) {
+        return res.status(500).json({message:error.message})
+    }
+}
