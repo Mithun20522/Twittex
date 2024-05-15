@@ -7,6 +7,7 @@ import authRouter from './routes/auth.route.js'
 import userRouter from './routes/user.route.js'
 import notifcationRouter from './routes/notfication.route.js'
 import {v2 as cloudinary} from 'cloudinary'
+import postRouter from './routes/post.route.js'
 
 dotenv.config()
 
@@ -32,5 +33,6 @@ connectMongoDB(MONGO_URL)
 app.use('/api/auth',authRouter)
 app.use('/api/user',userRouter)
 app.use('/api/notification', notifcationRouter)
+app.use('/api/post',postRouter)
 
 app.listen(PORT,() => console.log(`server is running on PORT:${PORT}`))
