@@ -48,7 +48,30 @@ export const deletePost = async(req, res) => {
         }
         await Post.findByIdAndDelete(id)
         return res.status(200).json({message:'post deleted successfully'})
+
+    } catch (error) {
+        return res.status(500).json({message:error.message})
+    }
+}
+
+export const commentOnPost = async(req, res) => {
+    try {
+        const {text} = req.body
+        const postId = req.params.id
+        const userId = req.user._id
+        if(!text){
+            return res.status(400).json({message:'text field is required'})
+        }
+        const post = await Post.findById(postId)
+        if(!post){
+            return res.status(404).json({message:'post not found'})
+        }
+
+        const comment = {user:userId, text}
+        post.comments.push(comment)
         
+        await post.save()
+        return res.status(200).json(post)
     } catch (error) {
         return res.status(500).json({message:error.message})
     }
