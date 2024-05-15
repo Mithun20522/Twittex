@@ -90,11 +90,13 @@ export const likeDislikePost = async(req, res) => {
         if(likedPostByUser){
             // dislike post
             await Post.updateOne({_id:postId},{$pull: {likes: userId}})
+            await User.updateOne({_id:userId},{$pull: {likedPosts:postId}})
             return res.status(200).json({message:'post disliked succeefully'})
         }
         else{
             //like post
             post.likes.push(userId)
+            await User.updateOne({_id:userId},{$push: {likedPosts:postId}})
             await post.save()
 
             const notification = new Notification({
@@ -123,6 +125,55 @@ export const getAllPosts = async(req, res) => {
             return res.status(404).json({message:'You have no posts yet'})
         }
         return res.status(200).json(posts)
+    } catch (error) {
+        return res.status(500).json({message:error.message})
+    }
+}
+
+export const getLikedPosts = async(req, res) => {
+    try {
+        const userId = req.params.id
+        const user = await User.findById(userId)
+        if(!user){
+            return res.status(404).json({message:'user not found'})
+        }
+        const likedPosts = await Post.find({_id: {$in: user.likedPosts}})
+        .populate({
+            path:'user',
+            select:'-password'
+        })
+        .populate({
+            path:'comments.user',
+            select:'-password'
+        })
+
+        return res.status(200).json(likedPosts)
+
+    } catch (error) {
+        return res.status(500).json({message:error.message})
+    }
+}
+
+export const getFollowingUserPosts = async(req, res) => {
+    try {
+        const userId = req.user._id
+        const user = await User.findById(userId)
+        if(!user){
+            return res.status(404).json({message:'user not found'})
+        }
+        const following = user.following
+        const feedPosts = await Post.find({user: {$in: following}})
+        .sort({createdAt:-1})
+        .populate({
+            path:'user',
+            select:'-password'
+        })
+        .populate({
+            path:'comments.user',
+            select:'-password'
+        })
+        return res.status(200).json(feedPosts)
+        
     } catch (error) {
         return res.status(500).json({message:error.message})
     }
