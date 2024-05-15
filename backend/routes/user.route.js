@@ -7,6 +7,6 @@ const userRouter = express.Router()
 userRouter.get('/get-user-profile/:username', verifyToken, getUserProfile)
 userRouter.get('/follow-unfollow-user/:id', verifyToken, followUnfollowUser)
 userRouter.get('/get-suggested-users', verifyToken, getSuggestedUsers)
-userRouter.patch('/update-user/:id', verifyToken, updateUser)
+userRouter.post('/update-user', verifyToken, updateUser)
 
 export default userRouter
