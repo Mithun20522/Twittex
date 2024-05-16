@@ -2,10 +2,13 @@ import Notification from "../models/notification.model.js";
 
 export const getAllNotifications = async(req, res) => {
     try {
-        const notifications = await Notification.find()
-        if(notifications.length === 0){
-            return res.status(404).json({message:'No notfication yet'})
-        }
+        const userId = req.user._id
+        const notifications = await Notification.find({to:userId})
+        .populate({
+            path:'from',
+            select:'username profileImg'
+        })
+        await Notification.updateMany({to:userId}, {read:true})
         return res.status(200).json(notifications)
     } catch (error) {
         return res.status(500).json({message:error.message})
@@ -14,14 +17,22 @@ export const getAllNotifications = async(req, res) => {
 
 export const clearAllNotifications = async(req, res) => {
     try {
-        const notifications = await Notification.find()
-        if(notifications.length === 0){
-            return res.status(404).json({message:'No notfication yet'})
+        const userId = req.user._id
+        await Notification.deleteMany({to: userId})
+        return res.status(200).json({message:'notifications deleted successfully'})
+    } catch (error) {
+        return res.status(500).json({message:error.message})
+    }
+}
+
+export const deleteNotification = async(req, res) => {
+    try {
+        const {id}  = req.params
+        const notification = await Notification.findByIdAndDelete(id)
+        if(!notification){
+            return res.status(404).json({message:'No notification found'})
         }
-        notifications.map(async(notif) => {
-            await Notification.findByIdAndDelete(notif._id)
-        })
-        return res.status(200).json({message:'notifications cleared'})
+        return res.status(200).json({message:'notification deleted successfully'})
     } catch (error) {
         return res.status(500).json({message:error.message})
     }
